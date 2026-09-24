@@ -44,7 +44,7 @@ def main() -> int:
         def walk(value):
             if isinstance(value, dict):
                 for k, v in value.items():
-                    if isinstance(v, str) and (k in {"service_worker", "default_popup"} or k.isdigit()):
+                    if isinstance(v, str) and (k in {"service_worker", "default_popup", "js", "css"} or k.isdigit()):
                         check_ref(v, manifest_path, missing)
                     else:
                         walk(v)
