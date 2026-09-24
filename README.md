@@ -28,3 +28,11 @@ A árvore pública contém o código-fonte parcial e o pacote ZIP histórico. A 
 ## Teste
 
 Depois da reconciliação do pacote completo, carregue a pasta como extensão descompactada no Chrome em modo de desenvolvedor e valide instalação, popup, content script, extração, dashboard, persistência e exportação.
+
+## Validação estrutural
+
+Foi adicionado `tools/validate-extension.py`, que verifica referências locais de `manifest.json`, HTML, CSS e imports JavaScript antes de uma release. O objetivo é impedir que uma reorganização de diretórios introduza caminhos quebrados silenciosamente.
+
+## Próxima etapa técnica
+
+Antes de adicionar novas funções de extração, a base precisa passar pela reconciliação do pacote histórico: a árvore pública ainda referencia `popup/` e módulos de `modules/` que não estão presentes como arquivos independentes. Não serão criados stubs ou implementações fictícias para mascarar essas dependências; a implementação original deve ser recuperada e integrada.
