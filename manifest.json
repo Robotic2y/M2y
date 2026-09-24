@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "M2y - Smart Maps Extractor v2.15",
+  "version": "2.15.0",
+  "description": "Extrator profissional de leads do Google Maps v2.15 — precisão contextual, backup incremental, diagnóstico, fila controlada e interface essencial.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.google.com/maps/*",
+        "*://www.google.com.br/maps/*"
+      ],
+      "js": [
+        "content/extractor.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "downloads",
+    "unlimitedStorage",
+    "notifications",
+    "tabs",
+    "geolocation",
+    "debugger"
+  ],
+  "host_permissions": [
+    "*://www.google.com/*",
+    "*://www.google.com.br/*",
+    "*://nominatim.openstreetmap.org/*",
+    "*://viacep.com.br/*",
+    "*://servicodados.ibge.gov.br/*",
+    "https://ipwho.is/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/*",
+        "modules/*",
+        "icons/*",
+        "dashboard/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

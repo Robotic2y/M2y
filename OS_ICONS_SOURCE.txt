@@ -1,0 +1,11 @@
+Ícones de sistemas operacionais usados no popup
+
+Fonte: Icons8 — https://icons8.com/icons/set/os-platforms
+CDN dos assets:
+- https://img.icons8.com/color/48/windows-10.png
+- https://img.icons8.com/color/48/mac-os.png
+- https://img.icons8.com/color/48/linux.png
+- https://img.icons8.com/color/48/chrome.png
+- https://img.icons8.com/color/48/android-os.png
+
+Os arquivos foram incluídos localmente para evitar dependência de rede durante o uso da extensão.

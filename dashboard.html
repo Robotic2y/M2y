@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>M2y v2.15 - Dashboard & Relatórios</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="logo-area">
+        <img src="../icons/icon48.png" alt="Logo">
+        <h2>M2y <span>v2.15</span></h2>
+      </div>
+
+      <!-- Status em tempo real -->
+      <div class="sidebar-status">
+        <div class="sidebar-dot" id="sidebarDot"></div>
+        <span id="sidebarStatus">Sistema pronto</span>
+      </div>
+
+      <nav>
+        <ul>
+          <li class="nav-section-label" aria-hidden="true">Dados</li>
+          <li class="active" data-view="overview">📊 Visão Geral</li>
+          <li data-view="leads">📋 Leads Extraídos</li>
+          <li class="nav-section-label" aria-hidden="true">Insights</li>
+          <li data-view="profiles">🏢 Perfis detalhados</li>
+          <li data-view="analytics">📈 Análises</li>
+          <li class="nav-section-label" aria-hidden="true">Configurações</li>
+          <li data-view="customize">🎛 Personalizar tabela</li>
+          <li data-view="settings">⚙️ Configurações</li>
+          <li data-view="logs">📜 Logs e auditoria</li>
+          <li data-view="json">🔧 Painel JSON</li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-version">
+        M2y Smart Maps Extractor v2.15<br>
+        <span id="sidebarLeadCount">0 leads armazenados</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="content-header">
+        <div class="header-main">
+          <h1 id="viewTitle">Visão Geral</h1>
+          <!-- Barra de Progresso Realtime -->
+          <div id="scrapingProgress" class="scraping-progress-container hidden">
+            <div class="progress-info">
+              <span id="progressStatusText">Extraindo leads...</span>
+              <span id="progressPercentText">0%</span>
+            </div>
+            <div class="progress-bar-wrapper">
+              <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-metrics">
+              <span id="progressLeadsCount">0 / 0 leads</span>
+              <span id="progressSpeed">0 leads/min</span>
+              <span id="progressEta">ETA: --:--</span>
+            </div>
+          </div>
+        </div>
+        <div class="actions export-row">
+          <div class="action-group" aria-label="Exportação"><span class="action-group-label">Dados</span>
+          <button id="exportCsv"  class="btn-primary"   title="Exportar CSV">📊 CSV</button>
+          <button id="exportXlsx" class="btn-xlsx"      title="Exportar XLSX">📗 XLSX</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- VISÃO GERAL -->
+      <section id="overviewView" class="view">
+        <div class="metrics-grid">
+          <div class="metric-card highlight">
+            <h3>Total de Leads</h3>
+            <p id="mTotalLeads">0</p>
+          </div>
+          <div class="metric-card">
+            <h3>Taxa de Sucesso</h3>
+            <p id="mSuccessRate">0%</p>
+          </div>
+          <div class="metric-card">
+            <h3>Tempo Médio / Lead</h3>
+            <p id="mAvgTime">0s</p>
+          </div>
+          <div class="metric-card">
+            <h3>Duração Total</h3>
+            <p id="mDuration">0s</p>
+          </div>
+        </div>
+        <div class="metrics-grid funnel-metrics" aria-label="Funil da execução">
+          <div class="metric-card"><h3>Cards encontrados</h3><p id="fCardsFound">0</p></div>
+          <div class="metric-card"><h3>Processados</h3><p id="fCardsProcessed">0</p></div>
+          <div class="metric-card"><h3>Aceitos</h3><p id="fAccepted">0</p></div>
+          <div class="metric-card"><h3>Filtrados</h3><p id="fFiltered">0</p></div>
+          <div class="metric-card"><h3>Duplicados</h3><p id="fDuplicates">0</p></div>
+          <div class="metric-card"><h3>Erros</h3><p id="fErrors">0</p></div>
+          <div class="metric-card"><h3>Taxa de aceite</h3><p id="fAcceptanceRate">0%</p></div>
+          <div class="metric-card"><h3>Dados completos</h3><p id="fCompleteDataRate">0%</p></div>
+        </div>
+        <div class="chart-container">
+          <canvas id="leadsChart"></canvas>
+        </div>
+      </section>
+
+      <!-- LEADS EXTRAÍDOS -->
+      <section id="leadsView" class="view hidden">
+        <div class="bulk-toolbar panel-card">
+          <label class="bulk-select"><input type="checkbox" id="selectAllLeads"> Selecionar todos</label>
+          <span id="selectedLeadsCount">0 selecionados</span>
+          <button id="bulkCopyBtn" class="btn-secondary" disabled>Copiar selecionados</button>
+          <button id="bulkExportBtn" class="btn-secondary" disabled>Exportar selecionados</button>
+          <button id="bulkReviewBtn" class="btn-secondary" disabled>Marcar revisados</button>
+          <select id="tablePreset" title="Aplicar preset de tabela"><option value="default">Preset: Padrão</option><option value="prospecting">Prospecção</option><option value="quality">Qualidade</option><option value="operation">Operação</option></select>
+        </div>
+        <div class="table-filter-panel panel-card" aria-label="Filtros da planilha">
+          <div class="table-filter-header">
+            <div>
+              <h3>Filtros da planilha</h3>
+              <span id="filterSummary" class="filter-summary">Nenhum filtro aplicado</span>
+            </div>
+            <div class="table-filter-actions">
+              <button id="toggleFilterPanel" class="btn-secondary filter-action-btn" title="Mostrar ou ocultar filtros">Ocultar</button>
+              <button id="resetFilters" class="reset-btn" title="Resetar filtros">↺ Limpar filtros</button>
+            </div>
+          </div>
+          <div id="tableFilterBody" class="table-filter-body">
+          <div class="table-filter-tools">
+            <label class="global-search-label">Busca geral<input id="globalLeadSearch" type="search" placeholder="Pesquisar em todos os campos..."></label>
+            <button id="copyVisibleBtn" class="btn-secondary filter-action-btn" title="Copiar leads atualmente visíveis">Copiar visíveis</button>
+            <button id="exportVisibleBtn" class="btn-secondary filter-action-btn" title="Exportar leads atualmente visíveis">Exportar visíveis</button>
+            <button id="clearSelectionBtn" class="btn-secondary filter-action-btn" title="Limpar seleção atual">Limpar seleção</button>
+            <button id="fullscreenTableBtn" class="btn-secondary filter-action-btn" title="Alternar tela cheia da tabela">Tela cheia</button>
+            <button id="fitColumnsBtn" class="btn-secondary filter-action-btn" title="Restaurar larguras padrão das colunas">Ajustar colunas</button>
+          </div>
+          <div class="table-filter-grid">
+            <label>Nome<input type="text" class="col-filter" data-col="name" placeholder="Filtrar nome..."></label>
+            <label>Telefone<input type="text" class="col-filter" data-col="phone" placeholder="Filtrar telefone..."></label>
+            <label>Categoria<input type="text" class="col-filter" data-col="category_macro" placeholder="Filtrar categoria..."></label>
+            <label>Cidade/UF<input type="text" class="col-filter" data-col="city" placeholder="Filtrar cidade..."></label>
+            <label>Avaliação<div class="rating-filter-wrapper"><input type="number" class="col-filter rating-min" data-col="rating_value" placeholder="Mín." step="0.1" min="0" max="5"><input type="number" class="col-filter rating-max" data-col="rating_value" placeholder="Máx." step="0.1" min="0" max="5"></div></label>
+            <label>Presença<select class="col-filter" data-col="digital_presence"><option value="">Todos</option><option value="Sim">Sim</option><option value="Não">Não</option></select></label>
+            <label>Status<select class="col-filter" data-col="status"><option value="">Todos</option><option value="Ativo">Ativo</option><option value="Encerrado">Encerrado</option></select></label>
+          </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="leadsTable">
+            <thead>
+              <tr>
+                <th class="select-col">Sel.</th>
+                <th style="width:16%" class="sortable" data-sort="name">Nome <span class="sort-icon">↕</span></th>
+                <th style="width:11%">Telefone</th>
+                <th style="width:10%">Categoria</th>
+                <th style="width:10%">Cidade/UF</th>
+                <th style="width:9%" class="sortable" data-sort="rating_value">Avaliação <span class="sort-icon">↕</span></th>
+                <th style="width:8%">Presença</th>
+                <th style="width:11%">Redes / Site</th>
+                <th style="width:7%">Status</th>
+                <th style="width:9%">Horários</th>
+                <th style="width:16%; min-width:190px">Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PERFIL DETALHADO -->
+      <section id="profilesView" class="view hidden">
+        <div class="panel-card profile-selector-card">
+          <label for="profileSelect"><strong>Selecione um perfil:</strong></label>
+          <select id="profileSelect"><option value="">Nenhum perfil selecionado</option></select>
+          <button id="addCompareProfile" class="btn-secondary">Adicionar à comparação</button>
+        </div>
+        <div id="comparePanel" class="compare-panel hidden"><div class="compare-header"><h3>Comparação de perfis</h3><button id="clearCompare" class="btn-secondary">Limpar comparação</button></div><div id="compareGrid" class="compare-grid"></div></div>
+        <div id="profileDetail" class="profile-detail empty-profile">Selecione um lead para visualizar todos os dados coletados.</div>
+      </section>
+
+      <!-- ANÁLISES -->
+      <section id="analyticsView" class="view hidden">
+        <div class="metrics-grid">
+          <div class="metric-card"><h3>Com telefone</h3><p id="aWithPhone">0%</p></div>
+          <div class="metric-card"><h3>Com website</h3><p id="aWithWebsite">0%</p></div>
+          <div class="metric-card"><h3>Nota média</h3><p id="aAvgRating">0</p></div>
+          <div class="metric-card"><h3>Com screenshot</h3><p id="aWithScreenshot">0%</p></div>
+        </div>
+        <div class="analysis-grid"><div class="panel-card"><h3>Leads por cidade</h3><div id="cityBreakdown"></div></div><div class="panel-card"><h3>Leads por categoria</h3><div id="categoryBreakdown"></div></div></div>
+        <div class="panel-card"><h3>Qualidade e possíveis duplicidades</h3><div id="qualitySummary"></div><div id="duplicateGroups" class="duplicate-groups"></div></div>
+      </section>
+
+      <!-- PERSONALIZAÇÃO -->
+      <section id="customizeView" class="view hidden">
+        <div class="panel-card"><h2>Personalizar tabela de leads</h2><p>Escolha as colunas e ajuste a densidade visual. As preferências ficam salvas neste navegador.</p>
+          <div class="custom-grid"><label><input type="checkbox" data-column-index="1" checked> Nome</label><label><input type="checkbox" data-column-index="2" checked> Telefone</label><label><input type="checkbox" data-column-index="3" checked> Categoria</label><label><input type="checkbox" data-column-index="4" checked> Cidade/UF</label><label><input type="checkbox" data-column-index="5" checked> Avaliação</label><label><input type="checkbox" data-column-index="6" checked> Presença</label><label><input type="checkbox" data-column-index="7" checked> Redes/Site</label><label><input type="checkbox" data-column-index="8" checked> Status</label><label><input type="checkbox" data-column-index="9" checked> Horários</label><label><input type="checkbox" data-column-index="10" checked> Ações</label></div>
+          <label class="density-control">Altura das linhas <select id="rowDensity"><option value="compact">Compacta</option><option value="normal" selected>Normal</option><option value="comfortable">Confortável</option></select></label>
+          <button id="resetTableDimensions" class="btn-secondary">↺ Resetar largura e altura para padrão</button>
+        </div>
+      </section>
+
+      <!-- CONFIGURAÇÕES DO DASHBOARD -->
+      <section id="settingsView" class="view hidden">
+        <div class="panel-card settings-panel">
+          <div class="settings-heading"><div><h2>Configurações</h2><p>Preferências da visão e da auditoria. As configurações de extração continuam na tela inicial.</p></div><span class="settings-badge">Persistente neste navegador</span></div>
+          <div class="settings-grid">
+            <label><input type="checkbox" id="dashboardAutoRefresh" checked> Atualizar dados automaticamente enquanto o dashboard estiver aberto</label>
+            <label><input type="checkbox" id="dashboardScreenshotGuard" checked> Alertar quando existir lead sem screenshot válido</label>
+            <label><input type="checkbox" id="dashboardCompactMode"> Usar densidade compacta nas tabelas e cartões</label>
+            <label><input type="checkbox" id="dashboardKeepFilters" checked> Preservar filtros da tabela ao atualizar os dados</label>
+          </div>
+          <div class="settings-actions"><button id="saveDashboardSettings" class="btn-primary">💾 Salvar preferências</button><button id="resetDashboardSettings" class="btn-secondary">↺ Restaurar padrão</button><span id="dashboardSettingsStatus" role="status"></span></div>
+          <div class="settings-checks"><strong>Integridade da execução</strong><span id="dashboardScreenshotHealth">Verificando screenshots…</span><span id="dashboardExecutionHealth">Verificando última execução…</span></div>
+          <div class="system-tools-panel">
+            <h3>Diagnóstico e backup</h3>
+            <p class="settings-help">Ferramentas técnicas ficam aqui para não poluir a visão principal.</p>
+            <div class="system-tools-actions">
+              <button id="createBackupBtn" class="btn-secondary">Criar backup incremental</button>
+              <button id="exportBackupBtn" class="btn-secondary">Exportar backup completo</button>
+              <label class="btn-secondary file-button">Restaurar backup<input id="restoreBackupInput" type="file" accept="application/json,.json" hidden></label>
+              <button id="runHealthCheckBtn" class="btn-secondary">Health check</button>
+              <button id="copyDiagnosticsBtn" class="btn-secondary">Copiar diagnóstico</button>
+            </div>
+            <pre id="diagnosticsOutput" class="diagnostics-output" aria-live="polite">Nenhum diagnóstico executado.</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOGS DO SISTEMA -->
+      <section id="logsView" class="view hidden">
+        <div class="log-stats" id="logStats">
+          <span>Logs: <strong id="logTotal">0</strong></span>
+          <span class="stat-info">INFO: <strong id="logInfo">0</strong></span>
+          <span class="stat-warn">WARN: <strong id="logWarn">0</strong></span>
+          <span class="stat-error">ERR: <strong id="logError">0</strong></span>
+          <button class="btn-save-log" id="saveLogBtn">💾 Salvar Log</button>
+        </div>
+        <div class="log-container" id="logList"></div>
+      </section>
+
+      <!-- PAINEL JSON -->
+      <section id="jsonView" class="view hidden">
+        <div class="json-panel-container">
+          <div class="json-controls">
+            <button id="copyJsonBtn" class="btn-primary">Copiar JSON</button>
+            <span id="jsonStatus">Visualizando dados brutos em tempo real</span>
+          </div>
+          <pre id="jsonContent" class="json-display"></pre>
+        </div>
+      </section>
+
+      <!-- MODAL DE CONCLUSÃO -->
+      <div id="completionReport" class="completion-modal hidden">
+        <div class="completion-content">
+          <div class="completion-icon">✅</div>
+          <h2>Extração Finalizada com Sucesso!</h2>
+          <div class="completion-stats">
+            <div class="stat-item">
+              <span class="stat-label">Total de Leads:</span>
+              <span class="stat-value" id="reportTotalLeads">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Tempo Total:</span>
+              <span class="stat-value" id="reportTotalTime">0s</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Screenshots:</span>
+              <span class="stat-value" id="reportTotalScreenshots">0</span>
+            </div>
+          </div>
+          <button id="closeReport" class="btn-primary">Ver Dashboard</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../libs/chart.min.js"></script>
+  <script src="../libs/xlsx.full.min.js"></script>
+  <script src="dashboard.js" type="module"></script>
+  <script src="enhancements.js"></script>
+</body>
+</html>
